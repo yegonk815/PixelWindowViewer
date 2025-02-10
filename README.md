@@ -1,7 +1,8 @@
 # PixelWindowViewer
-Worked with ChatGPT Code Editor to create an application that allows users to view the pixel size of a window by adjusting the window or choosing a valid aspect ratio.
 
-This was another prompt engineering and long conversation session with ChatGPT to create a usable application that allowed users to resize a dummy window in real time to view the pixel size of the window. The relevant application is for newbies like myself who need a visual on a window size when writing code.
+Worked with ChatGPT Code Editor to create an application that allows users to view the pixel size of a window by adjusting the window, selecting an aspect ratio from the options provided, or creating a valid custom aspect ratio.
+
+This was another prompt engineering and long (nearly 2 working days) conversation session with ChatGPT to create a usable application that allowed users to resize a dummy window in real time to view the pixel size of the window. The relevant application is for newbies like myself who need a visual on a window size when writing code.
 
 My initial prompt is below. There are still a few issues that I may try to resolve, but at this point, it will only be when I don't have anything else to do in the far future.
 
