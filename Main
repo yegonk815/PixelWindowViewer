@@ -73,16 +73,7 @@ class OptionsWindow:
             self.ratio_2_var.set(False)
         except ValueError:
             messagebox.showerror("Error", "Aspect ratio must contain only positive integers separated by a colon.")
-
-
-        # custom_ratio = self.custom_ratio_entry.get()
-        # if ":" not in custom_ratio:
-        #     messagebox.showerror("Error", "Enter Aspect Ratio in format: XX:XX")
-        #     return
-        # self.ratio_var.set(custom_ratio)
-        # self.ratio_1_var.set(False)
-        # self.ratio_2_var.set(False)
-    
+  
     def toggle_ratio(self, ratio):
         if self.ratio_var.get() == ratio:
             self.ratio_var.set("")
