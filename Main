@@ -1,0 +1,138 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class PixelWindowViewer:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Pixel Window Viewer")
+        self.root.geometry("500x300")
+        self.root.configure(bg="#E0E0E0")
+        
+        self.title_label = tk.Label(root, text="Pixel Window Viewer", font=("Open Sans", 35, "bold"), fg="#000000", bg="#E0E0E0")
+        self.title_label.pack(pady=50)
+        
+        self.start_button = tk.Button(root, text="Start", font=("Open Sans", 20), fg="#FFFFFF", bg="#606060", command=self.open_options_window)
+        self.start_button.pack(pady=20)
+    
+    def open_options_window(self):
+        self.root.withdraw()
+        OptionsWindow()
+
+class OptionsWindow:
+    def __init__(self):
+        self.win = tk.Toplevel()
+        self.win.protocol("WM_DELETE_WINDOW", self.close_application)
+        self.win.title("Options")
+        self.win.geometry("600x400")
+        self.win.configure(bg="#E0E0E0")
+        
+        self.ratio_var = tk.StringVar(value="")
+        self.ratio_1_var = tk.BooleanVar(value=False)
+        self.ratio_2_var = tk.BooleanVar(value=False)
+        
+        self.aspect_label = tk.Label(self.win, text="Aspect Ratio", font=("Open Sans", 20), bg="#E0E0E0", fg="#000000")
+        self.aspect_label.pack(pady=10)
+        
+        self.radio_1 = tk.Checkbutton(self.win, text="1:1", variable=self.ratio_1_var, font=("Open Sans", 16), bg="#E0E0E0", command=lambda: self.toggle_ratio("1:1"))
+        self.radio_1.pack()
+        
+        self.radio_2 = tk.Checkbutton(self.win, text="16:9", variable=self.ratio_2_var, font=("Open Sans", 16), bg="#E0E0E0", command=lambda: self.toggle_ratio("16:9"))
+        self.radio_2.pack()
+        
+        self.custom_ratio_entry = tk.Entry(self.win, font=("Open Sans", 16))
+        self.custom_ratio_entry.pack(pady=5)
+        
+        self.set_custom_ratio_btn = tk.Button(self.win, text="Set Custom Ratio", command=self.set_custom_ratio, font=("Open Sans", 16))
+        self.set_custom_ratio_btn.pack()
+        
+        self.aspect_button = tk.Button(self.win, text="Maintain Aspect Ratio", font=("Open Sans", 20), fg="#FFFFFF", bg="#606060", command=lambda: self.open_dummy_window(True))
+        self.aspect_button.pack(pady=20)
+        
+        self.freeform_button = tk.Button(self.win, text="Free Form", font=("Open Sans", 20), fg="#FFFFFF", bg="#606060", command=lambda: self.open_dummy_window(False))
+        self.freeform_button.pack(pady=20)
+    
+    def close_application(self):
+        try:
+            if self.win.winfo_exists():
+                self.win.destroy()
+            root.destroy()
+        except tk.TclError:
+            pass
+    
+    def set_custom_ratio(self):
+        custom_ratio = self.custom_ratio_entry.get()
+        if ":" not in custom_ratio:
+            messagebox.showerror("Error", "Enter Aspect Ratio in format: XX:XX")
+            return
+        try:
+            w, h = map(int, custom_ratio.split(":"))
+            if w <= 0 or h <= 0:
+                raise ValueError
+            self.ratio_var.set(custom_ratio)
+            self.ratio_1_var.set(False)
+            self.ratio_2_var.set(False)
+        except ValueError:
+            messagebox.showerror("Error", "Aspect ratio must contain only positive integers separated by a colon.")
+
+
+        # custom_ratio = self.custom_ratio_entry.get()
+        # if ":" not in custom_ratio:
+        #     messagebox.showerror("Error", "Enter Aspect Ratio in format: XX:XX")
+        #     return
+        # self.ratio_var.set(custom_ratio)
+        # self.ratio_1_var.set(False)
+        # self.ratio_2_var.set(False)
+    
+    def toggle_ratio(self, ratio):
+        if self.ratio_var.get() == ratio:
+            self.ratio_var.set("")
+        else:
+            self.ratio_var.set(ratio)
+        self.ratio_1_var.set(self.ratio_var.get() == "1:1")
+        self.ratio_2_var.set(self.ratio_var.get() == "16:9")
+        self.custom_ratio_entry.delete(0, tk.END)
+    
+    def open_dummy_window(self, maintain_aspect):
+        aspect_ratio = self.ratio_var.get() if maintain_aspect else None
+        if maintain_aspect and not aspect_ratio:
+            messagebox.showerror("Error", "Select or enter a valid aspect ratio before proceeding.")
+            return
+        DummyWindow(aspect_ratio)
+
+class DummyWindow:
+    def __init__(self, aspect_ratio):
+        self.win = tk.Toplevel()
+        self.win.title("Dummy Window")
+        self.win.geometry("800x800")
+        self.win.configure(bg="#404040")
+        self.aspect_ratio = self.parse_ratio(aspect_ratio) if aspect_ratio else None
+        
+        self.win.bind("<Configure>", self.update_dimensions)
+        
+        self.dim_label = tk.Label(self.win, text="800 x 800", font=("Open Sans", 20, "bold"), fg="#FFFFFF", bg="#404040")
+        self.dim_label.pack(side=tk.BOTTOM, pady=10)
+        
+    def parse_ratio(self, ratio):
+        if ratio and ":" in ratio:
+            w, h = map(int, ratio.split(":"))
+            return w / h
+        return None
+    
+    def update_dimensions(self, event):
+        width, height = event.width, event.height
+        if self.aspect_ratio:
+            new_height = int(width / self.aspect_ratio)
+            new_width = int(height * self.aspect_ratio)
+            if abs(new_height - height) < abs(new_width - width):
+                width = new_width
+            else:
+                height = new_height
+            self.win.geometry(f"{width}x{height}")
+        self.win.after(10, lambda: self.dim_label.config(text=f"{self.win.winfo_width()} x {self.win.winfo_height()}"))
+
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PixelWindowViewer(root)
+    root.mainloop()
